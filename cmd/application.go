@@ -52,7 +52,7 @@ func showPage(selectedPage *pages.ClusterDetailsPage, key int32) {
 	commandFooterBar.Highlight(string(key)).ScrollToHighlight()
 	selectedPage.Render(ecsData)
 	clusterDetailsPages.SwitchToPage(selectedPage.Name)
-	ShowRefreshTime(*ecsData.Cluster.ClusterName, ecsData.Refreshed)
+	showRefreshTime(*ecsData.Cluster.ClusterName, ecsData.Refreshed)
 
 	// If the page about to be hidden has focus, switch focus to the new page
 	if frontPageView != nil && frontPageView.HasFocus() {
@@ -73,6 +73,9 @@ func renderCurrentClusterDetailsPage() {
 // Change focus between the cluster table and the cluster details page
 func changeFocus() {
 	_, pageView := clusterDetailsPages.GetFrontPage()
+	if pageView == nil {
+		return
+	}
 	if pageView.HasFocus() {
 		pageView.Blur()
 		clusterTable.Focus(nil)
@@ -125,7 +128,7 @@ func getCurrentlySelectedCluster() *aws.EcsCluster {
 	return cluster
 }
 
-func ShowRefreshTime(what string, when time.Time) {
+func showRefreshTime(what string, when time.Time) {
 	progressFooterBar.Clear()
 	fmt.Fprintf(progressFooterBar, "%s refreshed at %s", what, utils.FormatLocalTimeAmPmSecs(when))
 }
@@ -151,6 +154,11 @@ func buildUIElements() {
 		SetWrap(false).
 		SetTextAlign(ui.R)
 	progressFooterBar.SetBorderPadding(0, 0, 1, 2)
+
+	if clusterTable.GetRowCount() == 1 {
+		commandFooterBar.Clear()
+		fmt.Fprint(commandFooterBar, "No clusters found")
+	}
 
 	footer := tview.NewFlex().SetDirection(tview.FlexColumn).
 		AddItem(commandFooterBar, 0, 6, false).
@@ -197,6 +205,10 @@ func buildClusterTable() *tview.Table {
 	ui.AddTableData(table, 0, [][]string{headers}, alignment, expansions, tcell.ColorYellow, false)
 
 	ecsClusters := ecsview.GetClusters()
+	if len(ecsClusters) == 0 {
+		return table
+	}
+
 	data := funk.Map(ecsClusters, func(cluster *aws.EcsCluster) []string {
 
 		containers := ecsview.GetClusterContainers(cluster)
