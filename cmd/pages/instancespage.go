@@ -69,7 +69,9 @@ func renderInstancesTable(tableInfo *ui.TableInfo, ecsData *ecsview.ClusterData)
 	data := funk.Map(ecsData.Containers, func(instance *aws.EcsContainer) []string {
 
 		agentVersion := *instance.VersionInfo.AgentVersion
-		if agentVersion == *latestEcsAgentVersion {
+		if latestEcsAgentVersion == nil {
+			agentVersion = agentVersion + " ❓"
+		} else if agentVersion == *latestEcsAgentVersion {
 			agentVersion = agentVersion + " ✅"
 		} else {
 			agentVersion = agentVersion + " ⚠️"
