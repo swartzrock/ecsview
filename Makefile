@@ -11,7 +11,7 @@ clean:
 	@go clean
 	@rm -f $(BINARY_NAME)
 
-run: build lint build
+run: lint build
 	@./$(BINARY_NAME)
 
 lint:
@@ -19,3 +19,6 @@ lint:
 	@gofmt -s -w .
 	@$(linter) run
 
+install: lint build
+	@go install
+	@echo "Installed ecsview into ${shell which ecsview}"
