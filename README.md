@@ -1,5 +1,8 @@
 
-![screenshot](docs/logo.jpg)
+<p align="center">
+  <img width="400" height="113" src="docs/logo.jpg">
+</p>
+
 
 EcsView (ecsview) is a terminal UI for browsing Amazon Elastic Container Service (ECS) clusters. You can use it to view cluster usage, services, tasks, and individual container instances (ec2's). Uses the excellent [tview](https://github.com/rivo/tview/) library to build and manage the UI.
 
