@@ -54,10 +54,10 @@ func GetClusterContainers(cluster *aws.EcsCluster) []*aws.EcsContainer {
 	return clusterArnToEcsContainersMap[*cluster.ClusterArn]
 }
 
-// Got an AWS error? Likely a credential issue, so let the user know they need to configure their credentials
+// Got an AWS error? Print an error message and suggest correctly configuring their AWS profile
 func fatalAwsError(err error) {
 	if err != nil {
-		log.Fatal("Unable to locate AWS credentials. You can configure credentials by running 'aws configure'.")
+		log.Fatal("An issue occurred calling the AWS SDK. Please confirm you have the right AWS credentials in place. Error: ", err)
 	}
 }
 
