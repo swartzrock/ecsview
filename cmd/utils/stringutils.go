@@ -57,9 +57,12 @@ func BuildAsciiMeterCurrentTotal(portion int64, total int64, width int) string {
 	const fullChar = "█"
 	const emptyChar = "▒"
 
-	ratio := float64(portion) / float64(total)
-	ratio = math.Max(0, math.Min(1.0, ratio))
-	full := int(math.Round(ratio * float64(width)))
+	full := 0
+	if total > 0 {
+		ratio := float64(portion) / float64(total)
+		ratio = math.Max(0, math.Min(1.0, ratio))
+		full = int(math.Round(ratio * float64(width)))
+	}
 
 	return strings.Join([]string{
 		strings.Repeat(fullChar, full),
