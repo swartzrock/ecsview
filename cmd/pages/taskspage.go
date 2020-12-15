@@ -81,14 +81,17 @@ func renderTasksPage(tableInfo *ui.TableInfo, ecsData *ecsview.ClusterData) {
 			taskImages = strings.Join(images, ",")
 		}
 
-		// utils.TakeRight
+		ec2InstanceId := "n/a"
+		if task.ContainerInstanceArn != nil {
+			ec2InstanceId = arnToEc2InstanceIdMap[*task.ContainerInstanceArn]
+		}
 
 		return []string{
 			aws.ShortenTaskDefArn(task.TaskDefinitionArn),
 			taskImages,
 			status,
 			utils.FormatLocalDateTimeAmPmZone(*task.CreatedAt),
-			arnToEc2InstanceIdMap[*task.ContainerInstanceArn],
+			ec2InstanceId,
 			utils.TakeRight(utils.RemoveAllRegex(`.*/`, *task.TaskArn), 8),
 			utils.I64ToString(*task.Version),
 		}
