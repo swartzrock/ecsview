@@ -29,6 +29,9 @@ func DescribeClusters() ([]*ecs.Cluster, error) {
 	include := "STATISTICS"
 
 	err := client.ListClustersPagesWithContext(context.Background(), &ecs.ListClustersInput{}, func(output *ecs.ListClustersOutput, b bool) bool {
+		if len(output.ClusterArns) == 0 {
+			return false
+		}
 		clusterDetails, err := client.DescribeClusters(&ecs.DescribeClustersInput{
 			Clusters: output.ClusterArns,
 			Include:  []*string{&include},
@@ -58,6 +61,9 @@ func DescribeClusterServices(c *ecs.Cluster) ([]*ecs.Service, error) {
 	var services []*ecs.Service
 
 	err := client.ListServicesPagesWithContext(context.Background(), &ecs.ListServicesInput{Cluster: c.ClusterArn}, func(output *ecs.ListServicesOutput, b bool) bool {
+		if len(output.ServiceArns) == 0 {
+			return false
+		}
 		serviceDetails, err := client.DescribeServices(&ecs.DescribeServicesInput{
 			Cluster:  c.ClusterArn,
 			Services: output.ServiceArns,
@@ -87,6 +93,9 @@ func DescribeClusterTasks(c *ecs.Cluster) ([]*ecs.Task, error) {
 	var tasks []*ecs.Task
 
 	err := client.ListTasksPagesWithContext(context.Background(), &ecs.ListTasksInput{Cluster: c.ClusterArn}, func(output *ecs.ListTasksOutput, b bool) bool {
+		if len(output.TaskArns) == 0 {
+			return false
+		}
 		taskDetails, err := client.DescribeTasks(&ecs.DescribeTasksInput{
 			Cluster: c.ClusterArn,
 			Tasks:   output.TaskArns,
@@ -142,6 +151,9 @@ func DescribeContainerInstances(c *ecs.Cluster) ([]*ecs.ContainerInstance, error
 	var containerInstances []*ecs.ContainerInstance
 
 	err := client.ListContainerInstancesPagesWithContext(context.Background(), &ecs.ListContainerInstancesInput{Cluster: c.ClusterArn}, func(output *ecs.ListContainerInstancesOutput, b bool) bool {
+		if len(output.ContainerInstanceArns) == 0 {
+			return false
+		}
 		containerDetails, err := client.DescribeContainerInstances(&ecs.DescribeContainerInstancesInput{
 			Cluster:            c.ClusterArn,
 			ContainerInstances: output.ContainerInstanceArns,
