@@ -99,7 +99,7 @@ func renderInstancesTable(tableInfo *ui.TableInfo, ecsData *ecsview.ClusterData)
 		if taskCount != "0" {
 			tasks := make([]string, 0)
 			for _, task := range ecsData.Tasks {
-				if *task.ContainerInstanceArn == *instance.ContainerInstanceArn {
+				if task.ContainerInstanceArn != nil && *task.ContainerInstanceArn == *instance.ContainerInstanceArn {
 					tasks = append(tasks, aws.ShortenTaskDefArn(task.TaskDefinitionArn))
 				}
 			}
