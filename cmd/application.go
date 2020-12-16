@@ -171,7 +171,8 @@ func buildUIElements() {
 		AddItem(footer, 1, 1, false)
 
 	tviewApp = tview.NewApplication().
-		SetInputCapture(handleAppInput)
+		SetInputCapture(handleAppInput).
+		EnableMouse(true)
 
 	// Show the services page
 	selectClusterDetailsPageByKey('1')
@@ -265,7 +266,7 @@ func buildCommandFooterBar() *tview.TextView {
 
 	footerPageText := strings.Join(pageCommands, " ")
 	footerPageText = fmt.Sprintf(`%s %c [white::b]R[darkcyan::-] Refresh-Data`, footerPageText, tcell.RuneVLine)
-	footerPageText = fmt.Sprintf(`%s [white::b]Tab[darkcyan::-] Next-View`, footerPageText)
+	footerPageText = fmt.Sprintf(`%s [white::b]Tab / Mouse[darkcyan::-] Navigate`, footerPageText)
 
 	fmt.Fprint(footerBar, footerPageText)
 
