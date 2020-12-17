@@ -53,12 +53,8 @@ func instancesPageRenderer(tableInfo *ui.TableInfo) func(*ecsview.ClusterData) {
 
 func renderInstancesTable(tableInfo *ui.TableInfo, ecsData *ecsview.ClusterData) {
 
-	var err error
 	if latestEcsAgentVersion == nil {
-		latestEcsAgentVersion, err = aws.GetLatestECSAgentVersion()
-		if err != nil {
-			fmt.Println("ecsview: Unable to retrieve latest ECS Agent version from Github", err)
-		}
+		latestEcsAgentVersion, _ = aws.GetLatestECSAgentVersion()
 	}
 
 	ui.TruncTableRows(tableInfo.Table, 1)
