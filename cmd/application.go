@@ -56,8 +56,8 @@ func showPage(selectedPage *pages.ClusterDetailsPage, key int32) {
 
 	// If the page about to be hidden has focus, switch focus to the new page
 	if frontPageView != nil && frontPageView.HasFocus() {
-		frontPageView.Blur()
-		selectedPage.GetTable().Focus(nil)
+		RemoveFocus(frontPageView)
+		AddFocus(selectedPage.GetTable())
 	}
 }
 
@@ -73,15 +73,30 @@ func renderCurrentClusterDetailsPage() {
 // Change focus between the cluster table and the cluster details page
 func changeFocus() {
 	_, pageView := clusterDetailsPages.GetFrontPage()
+
 	if pageView == nil {
 		return
 	}
-	if pageView.HasFocus() {
-		pageView.Blur()
-		clusterTable.Focus(nil)
+	if clusterTable.HasFocus() {
+		RemoveFocus(clusterTable)
+		AddFocus(pageView)
 	} else {
-		clusterTable.Blur()
-		pageView.Focus(nil)
+		RemoveFocus(pageView)
+		AddFocus(clusterTable)
+	}
+}
+
+func AddFocus(p tview.Primitive) {
+	if table, ok := p.(*tview.Table); ok {
+		table.Focus(nil)
+		table.SetBorderColor(tcell.ColorGoldenrod)
+	}
+}
+
+func RemoveFocus(p tview.Primitive) {
+	if table, ok := p.(*tview.Table); ok {
+		table.Blur()
+		table.SetBorderColor(tcell.ColorGray)
 	}
 }
 
@@ -176,6 +191,7 @@ func buildUIElements() {
 
 	// Show the services page
 	selectClusterDetailsPageByKey('1')
+	changeFocus()
 
 	if err := tviewApp.SetRoot(flex, true).Run(); err != nil {
 		panic(err)
@@ -191,7 +207,6 @@ func buildClusterTable() *tview.Table {
 		SetSelectable(true, false)
 	table.
 		SetBorder(true).
-		SetBorderColor(tcell.ColorDimGray).
 		SetTitle(" ✨ ECS Clusters ").
 		SetBorderPadding(0, 0, 1, 1)
 
