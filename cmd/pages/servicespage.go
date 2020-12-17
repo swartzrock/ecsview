@@ -23,17 +23,16 @@ func NewServicesPage() *ClusterDetailsPage {
 	servicesTable.
 		SetBorders(true).
 		SetBorder(true).
-		SetBorderColor(tcell.ColorDimGray).
 		SetTitle(" 📋 ECS Services ")
 
 	servicesTableInfo := &ui.TableInfo{
 		Table:      servicesTable,
-		Alignment:  []int{ui.L, ui.L, ui.L, ui.L, ui.L, ui.R, ui.R, ui.R},
+		Alignment:  []int{ui.L, ui.L, ui.L, ui.L, ui.L, ui.L, ui.R, ui.R, ui.R},
 		Expansions: []int{1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1},
 		Selectable: true,
 	}
 	ui.AddTableConfigData(servicesTableInfo, 0, [][]string{
-		{"Name ▾", "TaskDef", "Images", "Status", "Deployed", "Tasks"},
+		{"#", "Name ▾", "TaskDef", "Images", "Status", "Deployed", "Tasks"},
 	}, tcell.ColorYellow)
 
 	return &ClusterDetailsPage{
@@ -90,7 +89,9 @@ func renderServicesTable(tableInfo *ui.TableInfo, ecsData *ecsview.ClusterData) 
 		}
 	}).([][]string)
 
+	data = PrependRowNumColumn(data)
+
 	ui.AddTableConfigData(tableInfo, 1, data, tcell.ColorWhite)
 	servicesColumnStyle := tcell.StyleDefault.Bold(true).Foreground(tcell.ColorWhite)
-	ui.SetColumnStyle(tableInfo.Table, 0, 1, servicesColumnStyle)
+	ui.SetColumnStyle(tableInfo.Table, 1, 1, servicesColumnStyle)
 }
