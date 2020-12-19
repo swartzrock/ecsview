@@ -27,7 +27,11 @@ var progressFooterBar *tview.TextView
 
 // Entrypoint for the ecsview application
 func Entrypoint() {
+	fmt.Println("Loading information about your AWS ECS clusters and container instances...")
 	buildUIElements()
+	if err := tviewApp.Run(); err != nil {
+		panic(err)
+	}
 }
 
 // Select a cluster details page with a single key shortcut
@@ -56,8 +60,7 @@ func showPage(selectedPage *pages.ClusterDetailsPage, key int32) {
 
 	// If the page about to be hidden has focus, switch focus to the new page
 	if frontPageView != nil && frontPageView.HasFocus() {
-		RemoveFocus(frontPageView)
-		AddFocus(selectedPage.GetTable())
+		tviewApp.SetFocus(selectedPage.GetTable())
 	}
 }
 
@@ -78,25 +81,9 @@ func changeFocus() {
 		return
 	}
 	if clusterTable.HasFocus() {
-		RemoveFocus(clusterTable)
-		AddFocus(pageView)
+		tviewApp.SetFocus(pageView)
 	} else {
-		RemoveFocus(pageView)
-		AddFocus(clusterTable)
-	}
-}
-
-func AddFocus(p tview.Primitive) {
-	if table, ok := p.(*tview.Table); ok {
-		table.Focus(nil)
-		table.SetBorderColor(tcell.ColorGoldenrod)
-	}
-}
-
-func RemoveFocus(p tview.Primitive) {
-	if table, ok := p.(*tview.Table); ok {
-		table.Blur()
-		table.SetBorderColor(tcell.ColorGray)
+		tviewApp.SetFocus(clusterTable)
 	}
 }
 
@@ -148,7 +135,7 @@ func showRefreshTime(what string, when time.Time) {
 	fmt.Fprintf(progressFooterBar, "%s refreshed at %s", what, utils.FormatLocalTimeAmPmSecs(when))
 }
 
-// Build the UI elements for this application
+// Build the UI elements and configures the application
 func buildUIElements() {
 
 	clusterTable = buildClusterTable()
@@ -159,6 +146,7 @@ func buildUIElements() {
 	clusterDetailsPageMap['3'] = pages.NewInstancesPage()
 	clusterDetailsPages = tview.NewPages()
 	for _, page := range clusterDetailsPageMap {
+		page.GetTable().SetBorderColor(tcell.ColorGoldenrod)
 		clusterDetailsPages.AddPage(page.Name, page.GetTable(), true, false)
 	}
 
@@ -186,17 +174,12 @@ func buildUIElements() {
 		AddItem(footer, 1, 1, false)
 
 	tviewApp = tview.NewApplication().
+		SetRoot(flex, true).
 		SetInputCapture(handleAppInput).
 		EnableMouse(true)
 
-	// Show the services page
+	// Show the services page, but start with the cluster table selected
 	selectClusterDetailsPageByKey('1')
-	changeFocus()
-
-	if err := tviewApp.SetRoot(flex, true).Run(); err != nil {
-		panic(err)
-	}
-
 }
 
 // Load the ECS clusters and create the cluster table
@@ -208,7 +191,8 @@ func buildClusterTable() *tview.Table {
 	table.
 		SetBorder(true).
 		SetTitle(" ✨ ECS Clusters ").
-		SetBorderPadding(0, 0, 1, 1)
+		SetBorderPadding(0, 0, 1, 1).
+		SetBorderColor(tcell.ColorDarkCyan)
 
 	table.SetSelectionChangedFunc(func(row, column int) {
 		renderCurrentClusterDetailsPage()
