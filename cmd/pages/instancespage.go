@@ -24,17 +24,16 @@ func NewInstancesPage() *ClusterDetailsPage {
 	instancesTable.
 		SetBorders(true).
 		SetBorder(true).
-		SetBorderColor(tcell.ColorDimGray).
 		SetTitle(" 📦 ECS Instances ")
 
 	instancesTableInfo := &ui.TableInfo{
 		Table:      instancesTable,
-		Alignment:  []int{ui.L, ui.L, ui.L, ui.L, ui.L, ui.L, ui.L, ui.L, ui.L},
+		Alignment:  []int{ui.L, ui.L, ui.L, ui.L, ui.L, ui.L, ui.L, ui.L, ui.L, ui.L},
 		Expansions: []int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		Selectable: true,
 	}
 	ui.AddTableConfigData(instancesTableInfo, 0, [][]string{
-		{"Instance Id ▾", "Status", "Type", "ECS Agent", "Registered", "Tasks", "CPU", "Memory"},
+		{"#", "Instance Id ▾", "Status", "Type", "ECS Agent", "Registered", "Tasks", "CPU", "Memory"},
 	}, tcell.ColorYellow)
 
 	return &ClusterDetailsPage{
@@ -53,12 +52,8 @@ func instancesPageRenderer(tableInfo *ui.TableInfo) func(*ecsview.ClusterData) {
 
 func renderInstancesTable(tableInfo *ui.TableInfo, ecsData *ecsview.ClusterData) {
 
-	var err error
 	if latestEcsAgentVersion == nil {
-		latestEcsAgentVersion, err = aws.GetLatestECSAgentVersion()
-		if err != nil {
-			fmt.Println("ecsview: Unable to retrieve latest ECS Agent version from Github", err)
-		}
+		latestEcsAgentVersion, _ = aws.GetLatestECSAgentVersion()
 	}
 
 	ui.TruncTableRows(tableInfo.Table, 1)
@@ -119,13 +114,15 @@ func renderInstancesTable(tableInfo *ui.TableInfo, ecsData *ecsview.ClusterData)
 		}
 	}).([][]string)
 
+	data = PrependRowNumColumn(data)
+
 	ui.AddTableConfigData(tableInfo, 1, data, tcell.ColorWhite)
 
 	instanceIdStyle := tcell.StyleDefault.Bold(true).Foreground(tcell.ColorWhite)
-	ui.SetColumnStyle(tableInfo.Table, 0, 1, instanceIdStyle)
+	ui.SetColumnStyle(tableInfo.Table, 1, 1, instanceIdStyle)
 
 	usageMeterStyle := tcell.StyleDefault.Foreground(tcell.ColorDarkCyan)
-	ui.SetColumnStyle(tableInfo.Table, 6, 1, usageMeterStyle)
 	ui.SetColumnStyle(tableInfo.Table, 7, 1, usageMeterStyle)
+	ui.SetColumnStyle(tableInfo.Table, 8, 1, usageMeterStyle)
 
 }

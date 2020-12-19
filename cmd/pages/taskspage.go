@@ -23,17 +23,16 @@ func NewTasksPage() *ClusterDetailsPage {
 	tasksTable.
 		SetBorders(true).
 		SetBorder(true).
-		SetBorderColor(tcell.ColorDimGray).
 		SetTitle(" 🐳 ECS Tasks ")
 
 	tasksTableInfo := &ui.TableInfo{
 		Table:      tasksTable,
-		Alignment:  []int{ui.L, ui.L, ui.L, ui.L, ui.L, ui.L, ui.R},
-		Expansions: []int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		Alignment:  []int{ui.L, ui.L, ui.L, ui.L, ui.L, ui.L, ui.L, ui.R},
+		Expansions: []int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
 		Selectable: true,
 	}
 	ui.AddTableConfigData(tasksTableInfo, 0, [][]string{
-		{"TaskDef ▾", "Images", "Status", "Created", "EC2 Instance", "Arn", "Version"},
+		{"#", "TaskDef ▾", "Images", "Status", "Created", "EC2 Instance", "Arn", "Version"},
 	}, tcell.ColorYellow)
 
 	return &ClusterDetailsPage{
@@ -97,8 +96,10 @@ func renderTasksPage(tableInfo *ui.TableInfo, ecsData *ecsview.ClusterData) {
 		}
 	}).([][]string)
 
+	data = PrependRowNumColumn(data)
+
 	ui.AddTableConfigData(tableInfo, 1, data, tcell.ColorWhite)
 	taskArnColumnStyle := tcell.StyleDefault.Bold(true).Foreground(tcell.ColorWhite)
-	ui.SetColumnStyle(tableInfo.Table, 0, 1, taskArnColumnStyle)
+	ui.SetColumnStyle(tableInfo.Table, 1, 1, taskArnColumnStyle)
 
 }
